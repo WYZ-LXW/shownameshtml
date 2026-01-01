@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>专属签到视频</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f5f5f5;
+    }
+    #input-area {
+      margin: 20px;
+    }
+    #video-container {
+      position: relative;
+      display: inline-block;
+      margin: 10px;
+    }
+    #name-overlay {
+      position: absolute;
+      /* 👇 根据你的视频调整位置！示例：底部居中 */
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      font-size: 28px;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+      pointer-events: none;
+    }
+    video {
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+
+<div id="input-area">
+  <p>请输入您的工号：</p>
+  <input type="text" id="employeeId" placeholder="例如：1001" />
+  <button onclick="showVideo()">确认</button>
+</div>
+
+<div id="video-container" style="display:none;">
+  <video id="myVideo" controls>
+    <source src="video.mp4" type="video/mp4">
+    您的浏览器不支持视频。
+  </video>
+  <div id="name-overlay"></div>
+</div>
+
+<script>
+  // 加载 names.json
+  let nameMap = {};
+
+  fetch('names.json')
+    .then(response => response.json())
+    .then(data => {
+      nameMap = data;
+    })
+    .catch(err => {
+      console.error('无法加载 names.json', err);
+      alert('系统初始化失败，请检查网络或联系管理员');
+    });
+
+  function showVideo() {
+    const id = document.getElementById('employeeId').value.trim();
+    if (!id) {
+      alert('请输入工号');
+      return;
+    }
+
+    const name = nameMap[id];
+    if (!name) {
+      alert('未找到该工号，请检查输入是否正确');
+      return;
+    }
+
+    // 显示名字和视频
+    document.getElementById('name-overlay').innerText = name;
+    document.getElementById('video-container').style.display = 'inline-block';
+
+    // 自动播放（部分浏览器需用户交互后才能播）
+    const video = document.getElementById('myVideo');
+    video.play().catch(e => console.log('自动播放被阻止，需手动点击播放'));
+  }
+</script>
+
+</body>
+</html>
